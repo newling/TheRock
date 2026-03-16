@@ -1731,7 +1731,8 @@
       }
     ],
 
-    "Gfxarch": "True"
+    "Gfxarch": "True",
+    "DisablePackaging": "True"
   },
 
   {
