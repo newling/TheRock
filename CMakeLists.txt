@@ -149,6 +149,7 @@ therock_enable_external_source("composable-kernel" "${THEROCK_SOURCE_DIR}/ml-lib
 
 # Overall build settings.
 option(THEROCK_VERBOSE "Enables verbose CMake statuses" OFF)
+option(THEROCK_VERBOSE_FPRINT "Enables verbose fingerprint calculation details" OFF)
 
 # Initialize the install directory.
 if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
@@ -288,6 +289,7 @@ therock_report_features()
 #
 # See therock_amdgpu_targets.cmake for further details.
 ################################################################################
+
 
 set(THEROCK_AMDGPU_FAMILIES "" CACHE STRING "AMDGPU target families to build for")
 set(THEROCK_AMDGPU_TARGETS "" CACHE STRING "AMDGPU targets to build for")
