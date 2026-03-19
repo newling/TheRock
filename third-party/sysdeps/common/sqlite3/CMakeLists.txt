@@ -4,14 +4,12 @@
 if(NOT CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
     # When included in TheRock, we download sources and set up the sub-project.
     set(_source_dir "${CMAKE_CURRENT_BINARY_DIR}/source")
-    set(_download_stamp "${_source_dir}/download.stamp")
 
     therock_subproject_fetch(therock-sqlite3-sources
       SOURCE_DIR "${_source_dir}"
       # Originally mirrored from: "https://www.sqlite.org/2025/sqlite-amalgamation-3500400.zip"
       URL "https://rocm-third-party-deps.s3.us-east-2.amazonaws.com/sqlite-amalgamation-3500400.zip"
       URL_HASH "SHA256=1d3049dd0f830a025a53105fc79fd2ab9431aea99e137809d064d8ee8356b032"
-      TOUCH "${_download_stamp}"
     )
 
     therock_cmake_subproject_declare(therock-sqlite3
@@ -32,7 +30,7 @@ if(NOT CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
       INTERFACE_PKG_CONFIG_DIRS
         lib/rocm_sysdeps/lib/pkgconfig
       EXTRA_DEPENDS
-        "${_download_stamp}"
+        therock-sqlite3-sources-download
     )
     therock_cmake_subproject_provide_package(therock-sqlite3 SQLite3 lib/rocm_sysdeps/lib/cmake/SQLite3)
     therock_cmake_subproject_activate(therock-sqlite3)
