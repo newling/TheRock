@@ -110,8 +110,6 @@ class TestConvolutions:
         inputs = torch.randn(1, 4, 5, 5, device="cuda")
         weights = torch.randn(4, 8, 3, 3, device="cuda")
         # Simply running any conv op exercises MIOpen and library loading.
-        # On Windows, this may fail if `amd_comgr_3.dll` (from build output) is
-        # used instead of `amd_comgr0605.dll` that is expected at runtime.
         result = torch.nn.functional.conv_transpose2d(inputs, weights, padding=1)
 
         # TODO: check conv output values (and don't use randn)
