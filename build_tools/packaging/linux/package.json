@@ -1854,7 +1854,7 @@
     "Group": "unknown",
     "License": "MIT",
     "Vendor": "Advanced Micro Devices, Inc",
-    "Homepage": "https://github.com/ROCm/rocm-systems/tree/develop/projects/rocshmem",
+    "Homepage": "https://github.com/ROCm/rocm-systems/",
     "Artifactory": [
       {
         "Artifact": "rocshmem",
@@ -1893,7 +1893,7 @@
     "Group": "unknown",
     "License": "MIT",
     "Vendor": "Advanced Micro Devices, Inc",
-    "Homepage": "https://github.com/ROCm/rocm-systems/tree/develop/projects/rocshmem",
+    "Homepage": "https://github.com/ROCm/rocm-systems/",
     "Artifactory": [
       {
         "Artifact": "rocshmem",
