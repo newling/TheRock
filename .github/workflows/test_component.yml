@@ -145,6 +145,22 @@ jobs:
           echo "HSA_XNACK=1" >> $GITHUB_ENV
           echo "ASAN_SYMBOLIZER_PATH=${{ env.OUTPUT_ARTIFACTS_DIR }}/llvm/bin/llvm-symbolizer" >> $GITHUB_ENV
 
+      # Start telemetry collection before test execution
+      # Collects CPU/memory metrics compatible with actions-orchestrator dashboards
+      - name: Start telemetry collection
+        if: ${{ inputs.platform == 'linux' }}
+        env:
+          TELEMETRY_STEP_NAME: "Test ${{ fromJSON(inputs.component).job_name }}"
+          TELEMETRY_STEP_ID: "test-component"
+        run: |
+          # Make telemetry script executable
+          chmod +x ./build_tools/ci_telemetry_collector.py
+
+          # Start background collection (writes to /tmp/ci-telemetry)
+          python3 ./build_tools/ci_telemetry_collector.py start --output-dir /tmp/ci-telemetry --sampling-interval 5 --flush-interval 30
+
+          echo "✓ Telemetry collection started"
+
       - name: Test
         id: test
         timeout-minutes: ${{ fromJSON(inputs.component).timeout_minutes }}
@@ -156,6 +172,28 @@ jobs:
           ROCM_KPACK_DEBUG: "1"
         run: |
           ${{ fromJSON(inputs.component).test_script }}
+
+      # Stop telemetry collection after test execution
+      - name: Stop telemetry collection
+        if: ${{ always() && inputs.platform == 'linux' }}
+        run: |
+          # Get test exit code (0 if success, 1 if failure)
+          EXIT_CODE=${{ steps.test.outcome == 'success' && '0' || '1' }}
+
+          # Stop collector and write final metrics
+          python3 ./build_tools/ci_telemetry_collector.py stop --exit-code $EXIT_CODE
+
+          echo "✓ Telemetry collection stopped (exit_code=$EXIT_CODE)"
+
+      # Upload telemetry metrics as artifacts for analysis
+      - name: Upload telemetry metrics
+        if: ${{ always() && inputs.platform == 'linux' }}
+        uses: actions/upload-artifact@e448a9b857ee2131e752b06002bf0e093c65e571 # v6.2.0
+        with:
+          name: telemetry-metrics-${{ fromJSON(inputs.component).job_name }}-shard-${{ matrix.shard }}-${{ inputs.amdgpu_families }}
+          path: /tmp/ci-telemetry/*.prom
+          retention-days: 7
+          if-no-files-found: warn
 
       - name: Print test reproduction steps
         # TODO: Add windows reproduction steps
