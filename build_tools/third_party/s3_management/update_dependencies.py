@@ -207,12 +207,12 @@ def run_update_dependencies(
             for pkg_name, pkg_info in PACKAGES_PER_PROJECT.items()
             if pkg_info["project"] == package
         }
-        for VERSION in VERSIONS:
+        for version in VERSIONS:
             for pkg_name, pkg_info in selected_packages.items():
                 if "target" in pkg_info and pkg_info["target"] != "":
-                    full_path = f"{VERSION}/{prefix}/{pkg_info['target']}"
+                    full_path = f"{version}/{prefix}/{pkg_info['target']}"
                 else:
-                    full_path = f"{VERSION}/{prefix}"
+                    full_path = f"{version}/{prefix}"
 
                 for target_version in pkg_info["versions"]:
                     upload_missing_whls(
@@ -223,41 +223,6 @@ def run_update_dependencies(
                         only_pypi=only_pypi,
                         target_version=target_version,
                     )
-
-
-def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
-    del context
-
-    event = event or {}
-    detail = event.get("detail", {})
-
-    package = event.get("package", detail.get("package", "torch"))
-    dry_run = event.get("dry_run", detail.get("dry_run", False))
-    only_pypi = event.get("only_pypi", detail.get("only_pypi", False))
-    bucket_name = event.get("bucket_name", detail.get("bucket_name"))
-
-    project_paths = get_project_paths()
-    if package not in project_paths:
-        raise ValueError(
-            f"Unsupported package '{package}'. Expected one of: {', '.join(project_paths)}"
-        )
-
-    run_update_dependencies(
-        package=package,
-        dry_run=dry_run,
-        only_pypi=only_pypi,
-        bucket_name=bucket_name,
-    )
-
-    return {
-        "statusCode": 200,
-        "body": {
-            "package": package,
-            "dry_run": dry_run,
-            "only_pypi": only_pypi,
-            "bucket_name": bucket_name or getenv("S3_BUCKET_PY", "therock-dev-python"),
-        },
-    }
 
 
 def main() -> None:
